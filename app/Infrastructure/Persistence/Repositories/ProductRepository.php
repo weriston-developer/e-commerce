@@ -57,40 +57,93 @@ class ProductRepository implements ProductRepositoryInterface
                 $q->where('is_active', true);
             });
 
-        // Filtro: Busca por nome ou descrição
-        if ($filters->search) {
+        // Conta quantos filtros foram fornecidos
+        $activeFilters = 0;
+        if ($filters->search) $activeFilters++;
+        if ($filters->categoryUuids && count($filters->categoryUuids) > 0) $activeFilters++;
+        if ($filters->minPrice !== null || $filters->maxPrice !== null) $activeFilters++;
+        if ($filters->onlyActive) $activeFilters++;
+        if ($filters->onlyInStock) $activeFilters++;
+
+        // Se houver mais de um filtro, usar OR entre eles
+        if ($activeFilters > 1) {
             $query->where(function ($q) use ($filters) {
-                $q->where('name', 'LIKE', "%{$filters->search}%")
-                  ->orWhere('description', 'LIKE', "%{$filters->search}%");
+                // Busca por nome ou descrição
+                if ($filters->search) {
+                    $q->where(function ($subQ) use ($filters) {
+                        $subQ->where('name', 'LIKE', "%{$filters->search}%")
+                             ->orWhere('description', 'LIKE', "%{$filters->search}%");
+                    });
+                }
+
+                // OU categorias específicas
+                if ($filters->categoryUuids && count($filters->categoryUuids) > 0) {
+                    $q->orWhereHas('category', function ($subQuery) use ($filters) {
+                        $subQuery->whereIn('uuid', $filters->categoryUuids);
+                    });
+                }
+
+                // OU range de preço
+                if ($filters->minPrice !== null || $filters->maxPrice !== null) {
+                    $q->orWhere(function ($priceQ) use ($filters) {
+                        if ($filters->minPrice !== null) {
+                            $minCents = (int) ($filters->minPrice * 100);
+                            $priceQ->where('price', '>=', $minCents);
+                        }
+                        if ($filters->maxPrice !== null) {
+                            $maxCents = (int) ($filters->maxPrice * 100);
+                            $priceQ->where('price', '<=', $maxCents);
+                        }
+                    });
+                }
+
+                // OU apenas produtos ativos
+                if ($filters->onlyActive) {
+                    $q->orWhere('is_active', true);
+                }
+
+                // OU apenas produtos com estoque
+                if ($filters->onlyInStock) {
+                    $q->orWhere('stock', '>', 0);
+                }
             });
-        }
+        } else {
+            // Se houver apenas um filtro, aplicar normalmente com AND
+            // Busca por nome ou descrição
+            if ($filters->search) {
+                $query->where(function ($q) use ($filters) {
+                    $q->where('name', 'LIKE', "%{$filters->search}%")
+                      ->orWhere('description', 'LIKE', "%{$filters->search}%");
+                });
+            }
 
-        // Filtro: Categorias específicas (array de UUIDs)
-        if ($filters->categoryUuids && count($filters->categoryUuids) > 0) {
-            $query->whereHas('category', function ($q) use ($filters) {
-                $q->whereIn('uuid', $filters->categoryUuids);
-            });
-        }
+            // Categorias específicas
+            if ($filters->categoryUuids && count($filters->categoryUuids) > 0) {
+                $query->whereHas('category', function ($subQuery) use ($filters) {
+                    $subQuery->whereIn('uuid', $filters->categoryUuids);
+                });
+            }
 
-        // Filtro: Range de preço (convertendo para centavos)
-        if ($filters->minPrice !== null) {
-            $minCents = (int) ($filters->minPrice * 100);
-            $query->where('price', '>=', $minCents);
-        }
+            // Range de preço (convertendo para centavos)
+            if ($filters->minPrice !== null) {
+                $minCents = (int) ($filters->minPrice * 100);
+                $query->where('price', '>=', $minCents);
+            }
 
-        if ($filters->maxPrice !== null) {
-            $maxCents = (int) ($filters->maxPrice * 100);
-            $query->where('price', '<=', $maxCents);
-        }
+            if ($filters->maxPrice !== null) {
+                $maxCents = (int) ($filters->maxPrice * 100);
+                $query->where('price', '<=', $maxCents);
+            }
 
-        // Filtro: Apenas produtos ativos
-        if ($filters->onlyActive) {
-            $query->where('is_active', true);
-        }
+            // Apenas produtos ativos
+            if ($filters->onlyActive) {
+                $query->where('is_active', true);
+            }
 
-        // Filtro: Apenas produtos com estoque
-        if ($filters->onlyInStock) {
-            $query->where('stock', '>', 0);
+            // Apenas produtos com estoque
+            if ($filters->onlyInStock) {
+                $query->where('stock', '>', 0);
+            }
         }
 
         // Ordenação
