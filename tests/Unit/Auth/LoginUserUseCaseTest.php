@@ -33,7 +33,7 @@ test('deve fazer login com credenciais válidas', function () {
     $user->uuid = 'uuid-123';
     $user->name = 'Usuario Teste';
     $user->email = $email;
-    $user->role = UserRole::CUSTOMER;
+    $user->role = UserRole::USER;
     $user->email_verified_at = null;
     $user->created_at = now();
     

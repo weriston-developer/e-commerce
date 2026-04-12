@@ -10,7 +10,7 @@ namespace App\Domain\Enums;
 enum UserRole: string
 {
     case ADMIN = 'admin';
-    case CUSTOMER = 'customer';
+    case USER = 'user';
 
     /**
      * Retorna o label legível
@@ -19,7 +19,7 @@ enum UserRole: string
     {
         return match($this) {
             self::ADMIN => 'Administrador',
-            self::CUSTOMER => 'Cliente',
+            self::USER => 'Usuário',
         };
     }
 
@@ -32,11 +32,11 @@ enum UserRole: string
     }
 
     /**
-     * Verifica se é customer
+     * Verifica se é usuário comum
      */
-    public function isCustomer(): bool
+    public function isUser(): bool
     {
-        return $this === self::CUSTOMER;
+        return $this === self::USER;
     }
 
     /**
