@@ -30,13 +30,13 @@ class DatabaseSeeder extends Seeder
             'role' => UserRole::ADMIN,
         ]);
 
-        // Criar usuário CUSTOMER de teste
+        // Criar usuário comum de teste
         User::create([
             'uuid' => (string) Str::uuid(),
-            'name' => 'Cliente Teste',
-            'email' => 'customer@ecommerce.com',
-            'password' => Hash::make('customer123'),
-            'role' => UserRole::CUSTOMER,
+            'name' => 'Usuário Teste',
+            'email' => 'user@ecommerce.com',
+            'password' => Hash::make('user123'),
+            'role' => UserRole::USER,
         ]);
 
         // Opcional: criar mais usuários para testes

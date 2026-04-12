@@ -30,7 +30,7 @@ readonly class CreateUserInput
             'name' => $this->name,
             'email' => $this->email,
             'password' => bcrypt($this->password), // Hash da senha
-            'role' => UserRole::CUSTOMER, // Role padrão
+            'role' => UserRole::USER, // Role padrão
         ];
     }
 }

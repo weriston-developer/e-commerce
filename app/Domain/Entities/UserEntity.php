@@ -77,7 +77,7 @@ class UserEntity
             name: $data['name'],
             email: $data['email'],
             password: $data['password'],
-            role: $data['role'] ?? UserRole::CUSTOMER,
+            role: $data['role'] ?? UserRole::USER,
         );
     }
 
@@ -90,11 +90,11 @@ class UserEntity
     }
 
     /**
-     * Verifica se o usuário é customer
+     * Verifica se o usuário é comum
      */
-    public function isCustomer(): bool
+    public function isUser(): bool
     {
-        return $this->role === UserRole::CUSTOMER;
+        return $this->role === UserRole::USER;
     }
 
     /**

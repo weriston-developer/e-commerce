@@ -10,7 +10,7 @@ use App\Application\CQRS\Queries\Product\GetAllProductsQuery;
 use App\Application\CQRS\Queries\Product\GetProductByUuidQuery;
 use App\Application\CQRS\Queries\Product\GetProductsByCategoryQuery;
 use App\Application\CQRS\Queries\Product\SearchProductsByPriceQuery;
-use App\Application\CQRS\Queries\Product\GetAllProductsQuery;
+use App\Application\CQRS\Queries\Product\SearchProductsQuery;
 use App\Application\DTOs\Inputs\CreateCategoryInput;
 use App\Application\DTOs\Inputs\CreateProductInput;
 use App\Application\DTOs\Inputs\ProductFiltersInput;
