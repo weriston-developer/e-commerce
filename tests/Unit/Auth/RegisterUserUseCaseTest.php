@@ -40,7 +40,7 @@ test('deve registrar novo usuário com sucesso', function () {
     $user->uuid = 'new-uuid-123';
     $user->name = $name;
     $user->email = $email;
-    $user->role = UserRole::CUSTOMER;
+    $user->role = UserRole::USER;
     $user->email_verified_at = null;
     $user->created_at = now();
     $user->allows()->setAttribute(Mockery::any(), Mockery::any());
@@ -59,7 +59,7 @@ test('deve registrar novo usuário com sucesso', function () {
             return $data['name'] === $name
                 && $data['email'] === $email
                 && isset($data['password']) // password foi hasheado
-                && $data['role'] === UserRole::CUSTOMER;
+                && $data['role'] === UserRole::USER;
         }))
         ->andReturn($user);
     
@@ -114,21 +114,21 @@ test('deve lançar exceção quando email já existe', function () {
         ->toThrow(EcommerceException::class);
 });
 
-test('deve criar usuário com role CUSTOMER por padrão', function () {
+test('deve criar usuário com role USER por padrão', function () {
     // Arrange
-    $name = 'Cliente Teste';
-    $email = 'cliente@example.com';
+    $name = 'Usuário Teste';
+    $email = 'usuario@example.com';
     $password = 'password123';
-    $token = 'customer-token';
+    $token = 'user-token';
     $ttl = 3600;
     
     $input = new CreateUserInput($name, $email, $password);
     
     $user = Mockery::mock(User::class)->makePartial();
-    $user->uuid = 'customer-uuid';
+    $user->uuid = 'user-uuid';
     $user->name = $name;
     $user->email = $email;
-    $user->role = UserRole::CUSTOMER;
+    $user->role = UserRole::USER;
     $user->email_verified_at = null;
     $user->created_at = now();
     $user->allows()->setAttribute(Mockery::any(), Mockery::any());
@@ -170,7 +170,7 @@ test('deve retornar AuthOutput com todos os campos obrigatórios', function () {
     $user->uuid = 'test-uuid';
     $user->name = 'Test User';
     $user->email = 'test@example.com';
-    $user->role = UserRole::CUSTOMER;
+    $user->role = UserRole::USER;
     $user->email_verified_at = null;
     $user->created_at = now();
     $user->allows()->setAttribute(Mockery::any(), Mockery::any());

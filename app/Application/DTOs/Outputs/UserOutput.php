@@ -13,6 +13,7 @@ readonly class UserOutput
         public string $uuid,
         public string $name,
         public string $email,
+        public string $role,
         public ?string $emailVerifiedAt,
         public string $createdAt,
     ) {}
@@ -23,6 +24,7 @@ readonly class UserOutput
             uuid: $user->uuid,
             name: $user->name,
             email: $user->email,
+            role: $user->role->value,
             emailVerifiedAt: $user->email_verified_at?->toIso8601String(),
             createdAt: $user->created_at->toIso8601String(),
         );
@@ -34,6 +36,7 @@ readonly class UserOutput
             'uuid' => $this->uuid,
             'name' => $this->name,
             'email' => $this->email,
+            'role' => $this->role,
             'email_verified_at' => $this->emailVerifiedAt,
             'created_at' => $this->createdAt,
         ];

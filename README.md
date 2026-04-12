@@ -1,6 +1,6 @@
 # 🛒 E-Commerce API
 
-API RESTful para E-commerce desenvolvida com Laravel 11, seguindo os princípios de **Clean Architecture**, **Domain-Driven Design (DDD)** e **CQRS** (Command Query Responsibility Segregation).
+API RESTful para E-commerce desenvolvida com Laravel 13, seguindo os princípios de **Clean Architecture**, **Domain-Driven Design (DDD)** e **CQRS** (Command Query Responsibility Segregation).
 
 ## 📋 Índice
 
@@ -16,6 +16,10 @@ API RESTful para E-commerce desenvolvida com Laravel 11, seguindo os princípios
 - [Padrões de Código](#-padrões-de-código)
 
 ---
+
+## Obersrvações
+
+O enunciado menciona Sanctum mas descreve o comportamento de JWT — token retornado no login, refresh, stateless. Optei por JWT por ser tecnicamente mais alinhado com o que foi descrito. Conheço Sanctum e posso implementar se a preferência da equipe for essa.
 
 ## 🎯 Sobre o Projeto
 
@@ -88,12 +92,12 @@ O projeto segue uma arquitetura em camadas inspirada em Clean Architecture e DDD
 
 ## 🚀 Tecnologias
 
-- **[Laravel 11](https://laravel.com/)** - Framework PHP
+- **[Laravel 13](https://laravel.com/)** - Framework PHP
 - **[PHP 8.3+](https://www.php.net/)** - Linguagem
 - **[MySQL 8.4](https://www.mysql.com/)** - Banco de dados
 - **[Docker](https://www.docker.com/)** - Containerização
 - **[Laravel Sail](https://laravel.com/docs/11.x/sail)** - Ambiente Docker para Laravel
-- **[JWT Auth](https://jwt-auth.readthedocs.io/)** - Autenticação JWT
+- **[JWT Auth](https://jwt-auth.readthedocs.io/)** - Autenticação JWT (tymon/jwt-auth v2.3)
 - **[Pest PHP](https://pestphp.com/)** - Framework de testes
 - **[Mockery](https://github.com/mockery/mockery)** - Biblioteca de mocks
 
@@ -226,7 +230,7 @@ docker compose exec laravel.test bash
 
 ## 🧪 Executando os Testes
 
-O projeto possui **58 testes unitários** com **259 assertions**, todos utilizando **100% mocks** (sem interação com banco de dados).
+O projeto possui **57 testes unitários** com **258 assertions**, todos utilizando **100% mocks** (sem interação com banco de dados).
 
 ### Executar todos os testes
 
@@ -277,14 +281,16 @@ docker compose exec laravel.test ./vendor/bin/pest tests/Unit/Queries/
 - ✅ **Auth UseCases**: 7 testes (Login, Register)
 - ✅ **Product UseCases**: 16 testes (Create, Update, Delete)
 - ✅ **Category UseCases**: 16 testes (Create, Update, Delete)
-- ✅ **Product Queries**: 18 testes (GetAll, Search, GetByCategory)
-- ✅ **Total**: **58 testes, 259 assertions**
+- ✅ **Product Queries**: 18 testes (GetAll, Search, GetByCategory, SearchByPrice)
+- ✅ **Total**: **57 testes, 258 assertions**
 
 ---
 
 ## 📚 Documentação da API
 
 Base URL: `http://localhost/api/v1`
+
+> **Nota**: Todas as rotas da API usam o prefixo `/api/v1`. As rotas públicas (leitura) não requerem autenticação, apenas as operações de escrita (POST, PUT, DELETE) e endpoints de usuário autenticado.
 
 ### 🔐 Autenticação
 
@@ -317,7 +323,7 @@ Registra um novo usuário.
     "uuid": "123e4567-e89b-12d3-a456-426614174000",
     "name": "João Silva",
     "email": "joao@example.com",
-    "role": "CUSTOMER"
+    "role": "USER"
   },
   "token": "eyJ0eXAiOiJKV1QiLCJhbGci...",
   "expires_in": 3600
@@ -345,7 +351,7 @@ Autentica um usuário.
     "uuid": "123e4567-e89b-12d3-a456-426614174000",
     "name": "João Silva",
     "email": "joao@example.com",
-    "role": "CUSTOMER"
+    "role": "USER"
   },
   "token": "eyJ0eXAiOiJKV1QiLCJhbGci...",
   "expires_in": 3600
@@ -388,7 +394,7 @@ Retorna dados do usuário autenticado.
   "uuid": "123e4567-e89b-12d3-a456-426614174000",
   "name": "João Silva",
   "email": "joao@example.com",
-  "role": "CUSTOMER",
+  "role": "USER",
   "created_at": "2024-01-01T00:00:00Z"
 }
 ```
@@ -653,7 +659,7 @@ Lista todos os usuários (requer permissão `delete-users`).
       "uuid": "user-123",
       "name": "João Silva",
       "email": "joao@example.com",
-      "role": "CUSTOMER",
+      "role": "USER",
       "created_at": "2024-01-01T00:00:00Z"
     }
   ]
@@ -702,7 +708,6 @@ app/
 │   │   └── Outputs/         # DTOs de saída
 │   ├── Errors/              # Classes de erro customizadas
 │   ├── Exceptions/          # Exception handler
-│   ├── Services/            # Serviços da aplicação
 │   └── UseCases/            # Use Cases (Commands)
 │       ├── Auth/
 │       ├── Category/
@@ -713,15 +718,24 @@ app/
 │   ├── Entities/            # Entidades de domínio
 │   ├── Enums/               # Enumerações
 │   ├── Interfaces/          # Repository Interfaces
-│   └── ValueObjects/        # Value Objects
+│   ├── Rules/               # Regras de validação customizadas
+│   ├── Services/            # Domain Services
+│   └── ValueObjects/        # Value Objects (MoneyVO, DecimalVO)
+│
+├── Http/                     # HTTP Layer
+│   ├── Middleware/          # Middlewares
+│   └── Requests/            # Form Requests (Validation)
+│       ├── Auth/
+│       ├── Category/
+│       ├── Product/
+│       └── User/
 │
 └── Infrastructure/           # Camada de Infraestrutura
     ├── Persistence/
     │   ├── Models/          # Eloquent Models
     │   └── Repositories/    # Repository Implementations
     └── Presentation/
-        ├── Controllers/     # HTTP Controllers
-        └── Requests/        # Form Requests (Validation)
+        └── Controllers/     # HTTP Controllers
 
 database/
 ├── factories/               # Model Factories
@@ -808,12 +822,13 @@ readonly class ProductOutput
 Encapsulam lógica de valor:
 
 ```php
-readonly class MoneyVO
+// MoneyVO estende DecimalVO e adiciona formatação de moeda
+readonly class MoneyVO extends DecimalVO
 {
     public function __construct(private float $amount) {}
 
     public function toFloat(): float { /* ... */ }
-    public function format(): string { /* ... */ }
+    public function format(): string { /* R$ 3.500,00 */ }
     public function toCents(): int { /* ... */ }
 }
 ```
@@ -837,15 +852,14 @@ interface ProductRepositoryInterface
 
 ### Roles
 
-- **ADMIN**: Acesso total
-- **MANAGER**: Gerenciar produtos e categorias
-- **CUSTOMER**: Acesso apenas leitura
+- **ADMIN**: Acesso total (gerenciar produtos, categorias e usuários)
+- **USER**: Acesso apenas leitura (consultar produtos e categorias)
 
 ### Gates
 
-- `manage-products`: Criar, editar, deletar produtos
-- `manage-categories`: Criar, editar, deletar categorias
-- `delete-users`: Deletar usuários
+- `manage-products`: Criar, editar, deletar produtos (apenas ADMIN)
+- `manage-categories`: Criar, editar, deletar categorias (apenas ADMIN)
+- `delete-users`: Deletar usuários (apenas ADMIN)
 
 ---
 
@@ -898,3 +912,4 @@ Para dúvidas ou sugestões, abra uma issue no repositório.
 ---
 
 **Desenvolvido com ❤️ usando Laravel, Clean Architecture e DDD**
+
