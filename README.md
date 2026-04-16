@@ -169,7 +169,7 @@ docker compose up -d
 ./vendor/bin/sail artisan jwt:secret
 ```
 
-### 8. (Opcional) Execute os seeders
+### 8. Execute os seeders
 
 ```bash
 ./vendor/bin/sail artisan db:seed
