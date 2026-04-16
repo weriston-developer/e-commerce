@@ -17,7 +17,7 @@ API RESTful para E-commerce desenvolvida com Laravel 13, seguindo os princípios
 
 ---
 
-## Obersrvações
+## Observação 
 
 O enunciado menciona Sanctum mas descreve o comportamento de JWT — token retornado no login, refresh, stateless. Optei por JWT por ser tecnicamente mais alinhado com o que foi descrito. Conheço Sanctum e posso implementar se a preferência da equipe for essa.
 
